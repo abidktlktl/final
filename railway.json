@@ -1,0 +1,35 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS",
+    "buildCommand": "cd backend && npm install && cd .. && npm install"
+  },
+  "deploy": {
+    "startCommand": "cd backend && node server-redis.js",
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10,
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 30
+  },
+  "services": [
+    {
+      "name": "redis",
+      "image": "redis:7-alpine",
+      "volumes": ["/data"]
+    }
+  ],
+  "variables": {
+    "AUTO_MIGRATE": {
+      "description": "Automatically migrate JSON data to Redis on startup",
+      "default": "true"
+    },
+    "REDIS_URL": {
+      "description": "Redis connection URL (automatically provided by Railway)",
+      "default": "${{REDIS_PRIVATE_URL}}"
+    },
+    "NODE_ENV": {
+      "description": "Node environment",
+      "default": "production"
+    }
+  }
+}

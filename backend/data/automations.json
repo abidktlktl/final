@@ -1,0 +1,69 @@
+{
+  "repliedComments": {},
+  "reels": {
+    "r1": {
+      "id": "r1",
+      "comment": "ddfd",
+      "schedule": null,
+      "followBefore": true,
+      "customButtons": [],
+      "customLinks": [],
+      "triggerWords": [],
+      "commentReplies": [],
+      "delay": 5,
+      "conditions": {
+        "minFollowers": 0,
+        "maxFollowers": 0,
+        "hasBio": false,
+        "verified": false
+      },
+      "createdAt": "2025-10-10T11:49:21.188Z",
+      "updatedAt": "2025-10-10T11:49:21.188Z"
+    },
+    "18099429115638946": {
+      "id": "18099429115638946",
+      "comment": "Hello",
+      "dm": "Hello",
+      "schedule": null,
+      "followBefore": false,
+      "customButtons": [],
+      "customLinks": [],
+      "triggerWords": [],
+      "commentReplies": [],
+      "delay": 0,
+      "conditions": {
+        "minFollowers": 0,
+        "maxFollowers": 0,
+        "hasBio": false,
+        "verified": false
+      },
+      "workflow": null,
+      "createdAt": "2025-10-14T08:34:34.416Z",
+      "updatedAt": "2025-10-14T08:34:34.416Z"
+    },
+    "18085596286908378": {
+      "id": "18085596286908378",
+      "comment": "Amazing content! 🔥 Keep up the great work! 💯",
+      "dm": "Amazing content! 🔥 Keep up the great work! 💯",
+      "schedule": null,
+      "followBefore": false,
+      "customButtons": [],
+      "customLinks": [],
+      "triggerWords": [
+        "test"
+      ],
+      "commentReplies": [],
+      "delay": 0,
+      "conditions": {
+        "minFollowers": 0,
+        "maxFollowers": 0,
+        "hasBio": false,
+        "verified": false
+      },
+      "workflow": null,
+      "createdAt": "2025-10-14T08:07:12.182Z",
+      "updatedAt": "2025-10-14T08:07:12.182Z"
+    }
+  },
+  "stories": {}
+}

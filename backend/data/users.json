@@ -1,0 +1,96 @@
+[
+  {
+    "igId": "test_user_123",
+    "username": "test_user",
+    "tags": [
+      "lead"
+    ],
+    "optOut": false,
+    "workflows": {
+      "active": "wf_engagement_booster",
+      "completed": [],
+      "currentStep": 0,
+      "startedAt": "2025-10-13T12:13:20.377Z"
+    },
+    "profile": {
+      "id": "test_user_123",
+      "username": "test_user"
+    },
+    "createdAt": "2025-10-13T12:13:20.375Z",
+    "updatedAt": "2025-10-13T12:13:20.378Z"
+  },
+  {
+    "igId": "test_user_id",
+    "username": "test_user",
+    "tags": [
+      "lead"
+    ],
+    "optOut": false,
+    "workflows": {
+      "active": "wf_engagement_booster",
+      "completed": [],
+      "currentStep": 0,
+      "startedAt": "2025-10-13T12:16:27.336Z"
+    },
+    "profile": {
+      "id": "test_user_id",
+      "username": "test_user"
+    },
+    "createdAt": "2025-10-13T12:16:27.334Z",
+    "updatedAt": "2025-10-13T12:16:27.337Z"
+  },
+  {
+    "igId": "real_user_123",
+    "username": "real_user",
+    "tags": [
+      "lead"
+    ],
+    "optOut": false,
+    "workflows": {
+      "active": "wf_engagement_booster",
+      "completed": [],
+      "currentStep": 0,
+      "startedAt": "2025-10-13T12:40:31.570Z"
+    },
+    "profile": {
+      "id": "real_user_123",
+      "username": "real_user"
+    },
+    "createdAt": "2025-10-13T12:40:31.566Z",
+    "updatedAt": "2025-10-13T12:40:31.570Z"
+  },
+  {
+    "igId": "232323232",
+    "username": "test",
+    "tags": [],
+    "optOut": false,
+    "workflows": {
+      "active": null,
+      "completed": [],
+      "currentStep": 0
+    },
+    "profile": {
+      "id": "232323232",
+      "username": "test"
+    },
+    "createdAt": "2025-10-13T16:31:43.633Z",
+    "updatedAt": "2025-10-13T16:31:43.633Z"
+  },
+  {
+    "igId": "test_user_789",
+    "username": "testuser",
+    "tags": [],
+    "optOut": false,
+    "workflows": {
+      "active": null,
+      "completed": [],
+      "currentStep": 0
+    },
+    "profile": {
+      "id": "test_user_789",
+      "username": "testuser"
+    },
+    "createdAt": "2025-10-14T08:44:04.659Z",
+    "updatedAt": "2025-10-14T08:44:04.659Z"
+  }
+]

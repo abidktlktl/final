@@ -1,0 +1,25 @@
+{
+    "id":  "demo-user-123",
+    "name":  "Demo User",
+    "email":  "demo@example.com",
+    "phone":  "+1 (555) 123-4567",
+    "bio":  "Instagram automation enthusiast and content creator",
+    "location":  "San Francisco, CA",
+    "website":  "https://example.com",
+    "avatar":  "",
+    "timezone":  "America/Los_Angeles",
+    "language":  "en",
+    "notifications":  {
+                          "email":  true,
+                          "push":  true,
+                          "automation":  true,
+                          "billing":  true
+                      },
+    "privacy":  {
+                    "profileVisible":  true,
+                    "dataSharing":  false,
+                    "analytics":  true
+                },
+    "createdAt":  "2025-09-22T10:25:53.856Z",
+    "updatedAt":  "2025-09-22T10:25:53.856Z"
+}

@@ -1,0 +1,231 @@
+[
+  {
+    "id": "wf_lead_magnet",
+    "name": "Lead Magnet Flow",
+    "triggers": [
+      {
+        "type": "comment",
+        "keywords": [
+          "free",
+          "ebook",
+          "guide",
+          "download",
+          "pdf"
+        ]
+      },
+      {
+        "type": "follow"
+      }
+    ],
+    "steps": [
+      {
+        "message": "Hey {{username}}! Thanks for your interest! 🙏 I'd love to send you my free ebook \"Instagram Growth Secrets\". Just reply with your email and I'll send it right over! 📚",
+        "delay": 5,
+        "quickReplies": [
+          "Send me the ebook!",
+          "Not right now"
+        ],
+        "buttons": [
+          {
+            "type": "web_url",
+            "title": "Download Now",
+            "url": "https://example.com/ebook"
+          }
+        ]
+      },
+      {
+        "message": "Awesome! I just sent the ebook to your email. Check your inbox (and spam folder just in case)! 📧 Let me know if you have any questions about growing on Instagram! 💫",
+        "delay": 0,
+        "conditions": {
+          "stopKeywords": [
+            "stop",
+            "unsubscribe",
+            "no"
+          ]
+        }
+      },
+      {
+        "message": "By the way, I noticed you're interested in Instagram growth. Would you like to join our free community where we share daily tips and strategies? 🤝",
+        "delay": 86400,
+        "quickReplies": [
+          "Yes, add me!",
+          "Maybe later"
+        ]
+      }
+    ],
+    "active": true,
+    "createdAt": "2025-01-13T08:00:00.000Z",
+    "updatedAt": "2025-01-13T08:00:00.000Z"
+  },
+  {
+    "id": "wf_welcome_follower",
+    "name": "Welcome New Follower",
+    "triggers": [
+      {
+        "type": "follow"
+      }
+    ],
+    "steps": [
+      {
+        "message": "Hey {{username}}! 👋 Thanks so much for the follow! I really appreciate you joining our community. What brings you here? ✨",
+        "delay": 10,
+        "quickReplies": [
+          "Love your content!",
+          "Learning Instagram",
+          "Just browsing"
+        ]
+      },
+      {
+        "message": "That's awesome! I post daily tips about Instagram growth and content creation. Is there anything specific you'd like me to cover? 💭",
+        "delay": 0,
+        "conditions": {
+          "stopKeywords": [
+            "stop",
+            "no",
+            "unsubscribe"
+          ]
+        }
+      }
+    ],
+    "active": true,
+    "createdAt": "2025-01-13T08:00:00.000Z",
+    "updatedAt": "2025-01-13T08:00:00.000Z"
+  },
+  {
+    "id": "wf_product_inquiry",
+    "name": "Product Inquiry Flow",
+    "triggers": [
+      {
+        "type": "comment",
+        "keywords": [
+          "price",
+          "cost",
+          "buy",
+          "purchase",
+          "how much"
+        ]
+      },
+      {
+        "type": "dm"
+      }
+    ],
+    "steps": [
+      {
+        "message": "Hey {{username}}! Thanks for asking about our product! 🚀 Our pricing starts at $29/month with a 14-day free trial. Would you like me to send you more details? 💫",
+        "delay": 5,
+        "quickReplies": [
+          "Yes, send details!",
+          "Schedule a call",
+          "Not right now"
+        ]
+      },
+      {
+        "message": "Perfect! Here's the link to our pricing page: https://example.com/pricing You can start the free trial there. Let me know if you have any questions! 🤝",
+        "delay": 0,
+        "conditions": {
+          "stopKeywords": [
+            "stop",
+            "no",
+            "unsubscribe"
+          ]
+        }
+      },
+      {
+        "message": "Just checking in - did you get a chance to check out our pricing page? I'm here if you have any questions! 💬",
+        "delay": 86400,
+        "quickReplies": [
+          "Yes, I checked it",
+          "Still deciding",
+          "Not yet"
+        ]
+      }
+    ],
+    "active": true,
+    "createdAt": "2025-01-13T08:00:00.000Z",
+    "updatedAt": "2025-01-13T08:00:00.000Z"
+  },
+  {
+    "id": "wf_engagement_booster",
+    "name": "Engagement Booster",
+    "triggers": [
+      {
+        "type": "comment",
+        "keywords": [
+          "amazing",
+          "love",
+          "great",
+          "awesome",
+          "fire"
+        ]
+      },
+      {
+        "type": "story_reply"
+      }
+    ],
+    "steps": [
+      {
+        "message": "Hey {{username}}! Thanks for the love on my content! 🙏 Really appreciate you taking the time to engage. What did you find most helpful? 💫",
+        "delay": 15,
+        "quickReplies": [
+          "The strategy!",
+          "The tips!",
+          "Everything!"
+        ]
+      },
+      {
+        "message": "That's awesome to hear! I'm actually working on a new guide about that exact topic. Would you like me to send it to you when it's ready? 📚",
+        "delay": 0,
+        "conditions": {
+          "stopKeywords": [
+            "stop",
+            "no",
+            "unsubscribe"
+          ]
+        }
+      }
+    ],
+    "active": true,
+    "createdAt": "2025-01-13T08:00:00.000Z",
+    "updatedAt": "2025-01-13T08:00:00.000Z"
+  },
+  {
+    "id": "wf_1760344067661",
+    "name": "Welcome Follower",
+    "triggers": [
+      {
+        "type": "follow",
+        "keywords": []
+      }
+    ],
+    "steps": [
+      {
+        "message": "Hey! 👋 Thanks so much for the follow! What brings you here? ✨",
+        "delay": 10,
+        "followBefore": false
+      }
+    ],
+    "active": true,
+    "createdAt": "2025-10-13T08:27:47.661Z",
+    "updatedAt": "2025-10-13T08:27:47.661Z"
+  },
+  {
+    "id": "wf_1760346365995",
+    "name": "Welcome Follower",
+    "triggers": [
+      {
+        "type": "follow",
+        "keywords": []
+      }
+    ],
+    "steps": [
+      {
+        "message": "Hey! 👋 Thanks so much for the follow! What brings you here? ✨",
+        "delay": 10,
+        "followBefore": false
+      }
+    ],
+    "active": true,
+    "createdAt": "2025-10-13T09:06:05.995Z",
+    "updatedAt": "2025-10-13T09:06:05.995Z"
+  }
+]

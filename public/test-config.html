@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Configuration Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #555;
+            margin-top: 0;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f9f9f9;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Frontend Configuration Test</h1>
+    
+    <div class="card">
+        <h2>Environment Information</h2>
+        <div id="env-info"></div>
+    </div>
+
+    <div class="card">
+        <h2>API Configuration</h2>
+        <div id="api-config"></div>
+    </div>
+
+    <div class="card">
+        <h2>Backend Connection Tests</h2>
+        <button onclick="testBackendStatus()">Test Backend Status</button>
+        <button onclick="testWithToken()">Test with Token</button>
+        <button onclick="testCORS()">Test CORS</button>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="card">
+        <h2>Manual Token Test</h2>
+        <input type="text" id="token-input" placeholder="Enter Instagram token" style="width: 100%; padding: 8px; margin-bottom: 10px;">
+        <button onclick="testManualToken()">Test Manual Token</button>
+        <div id="token-results"></div>
+    </div>
+
+    <script>
+        // Configuration
+        const RAILWAY_URL = 'https://dn-production.up.railway.app';
+        const NETLIFY_URL = 'https://reelcommnet.netlify.app';
+        
+        // Display environment info
+        function displayEnvInfo() {
+            const info = {
+                'Current URL': window.location.href,
+                'Origin': window.location.origin,
+                'Is Production': window.location.hostname === 'reelcommnet.netlify.app',
+                'Railway Backend': RAILWAY_URL,
+                'User Agent': navigator.userAgent
+            };
+            
+            let html = '<div class="test-item">';
+            for (const [key, value] of Object.entries(info)) {
+                html += `<strong>${key}:</strong> ${value}<br>`;
+            }
+            html += '</div>';
+            document.getElementById('env-info').innerHTML = html;
+        }
+
+        // Display API configuration
+        function displayApiConfig() {
+            const config = {
+                'API Base URL': RAILWAY_URL,
+                'Bot Status Endpoint': `${RAILWAY_URL}/api/bot/status`,
+                'Reels Endpoint': `${RAILWAY_URL}/api/reels`,
+                'Auth Endpoint': `${RAILWAY_URL}/api/auth/instagram`
+            };
+            
+            let html = '<div class="test-item">';
+            for (const [key, value] of Object.entries(config)) {
+                html += `<strong>${key}:</strong> <code>${value}</code><br>`;
+            }
+            html += '</div>';
+            document.getElementById('api-config').innerHTML = html;
+        }
+
+        // Test backend status
+        async function testBackendStatus() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<div class="test-item">Testing backend status...</div>';
+            
+            try {
+                const response = await fetch(`${RAILWAY_URL}/api/bot/status`);
+                const data = await response.json();
+                
+                resultsDiv.innerHTML = `
+                    <div class="test-item">
+                        <strong>Backend Status:</strong> 
+                        <span class="status success">CONNECTED</span><br>
+                        <strong>Response:</strong>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="test-item">
+                        <strong>Backend Status:</strong> 
+                        <span class="status error">FAILED</span><br>
+                        <strong>Error:</strong> ${error.message}<br>
+                        <strong>Possible Issues:</strong>
+                        <ul>
+                            <li>Railway backend not deployed</li>
+                            <li>Environment variables not set</li>
+                            <li>CORS not configured</li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+
+        // Test CORS
+        async function testCORS() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<div class="test-item">Testing CORS configuration...</div>';
+            
+            try {
+                const response = await fetch(`${RAILWAY_URL}/api/bot/status`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': window.location.origin
+                    }
+                });
+                
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('access-control-allow-origin'),
+                    'Access-Control-Allow-Methods': response.headers.get('access-control-allow-methods'),
+                    'Access-Control-Allow-Headers': response.headers.get('access-control-allow-headers')
+                };
+                
+                resultsDiv.innerHTML = `
+                    <div class="test-item">
+                        <strong>CORS Test:</strong> 
+                        <span class="status ${response.ok ? 'success' : 'error'}">${response.ok ? 'PASSED' : 'FAILED'}</span><br>
+                        <strong>CORS Headers:</strong>
+                        <pre>${JSON.stringify(corsHeaders, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="test-item">
+                        <strong>CORS Test:</strong> 
+                        <span class="status error">FAILED</span><br>
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Test with token
+        async function testWithToken() {
+            const resultsDiv = document.getElementById('test-results');
+            const token = document.getElementById('token-input').value || 'test-token';
+            
+            resultsDiv.innerHTML = '<div class="test-item">Testing with authorization token...</div>';
+            
+            try {
+                const response = await fetch(`${RAILWAY_URL}/api/reels`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultsDiv.innerHTML = `
+                        <div class="test-item">
+                            <strong>Token Test:</strong> 
+                            <span class="status success">SUCCESS</span><br>
+                            <strong>Status:</strong> ${response.status}<br>
+                            <strong>Data:</strong>
+                            <pre>${JSON.stringify(data, null, 2).substring(0, 500)}...</pre>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `
+                        <div class="test-item">
+                            <strong>Token Test:</strong> 
+                            <span class="status error">FAILED</span><br>
+                            <strong>Status:</strong> ${response.status} ${response.statusText}<br>
+                            <strong>Note:</strong> This is expected if you haven't entered a valid token
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="test-item">
+                        <strong>Token Test:</strong> 
+                        <span class="status error">FAILED</span><br>
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Test manual token
+        async function testManualToken() {
+            const token = document.getElementById('token-input').value;
+            const resultsDiv = document.getElementById('token-results');
+            
+            if (!token) {
+                resultsDiv.innerHTML = '<div class="test-item"><span class="status error">Please enter a token</span></div>';
+                return;
+            }
+            
+            resultsDiv.innerHTML = '<div class="test-item">Testing manual token...</div>';
+            
+            try {
+                const response = await fetch(`${RAILWAY_URL}/api/reels`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultsDiv.innerHTML = `
+                        <div class="test-item">
+                            <strong>Manual Token:</strong> 
+                            <span class="status success">VALID</span><br>
+                            <strong>Reels Found:</strong> ${data.length || 0}<br>
+                            <strong>Token Preview:</strong> ${token.substring(0, 20)}...
+                        </div>
+                    `;
+                } else {
+                    const error = await response.text();
+                    resultsDiv.innerHTML = `
+                        <div class="test-item">
+                            <strong>Manual Token:</strong> 
+                            <span class="status error">INVALID</span><br>
+                            <strong>Status:</strong> ${response.status}<br>
+                            <strong>Error:</strong> ${error}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="test-item">
+                        <strong>Manual Token:</strong> 
+                        <span class="status error">CONNECTION FAILED</span><br>
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            displayEnvInfo();
+            displayApiConfig();
+        };
+    </script>
+</body>
+</html>
