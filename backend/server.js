@@ -21,9 +21,25 @@ const PORT = process.env.PORT || 4000;
 console.log(`🔍 Using PORT: ${PORT}`);
 console.log('🌍 Environment:', process.env.NODE_ENV || 'development');
 
-// Register CORS plugin with simplified configuration
+// Register CORS plugin with specific origins for production
+const allowedOrigins = [
+  'https://final-production-cdd8.up.railway.app',
+  'http://localhost:3000',
+  'http://localhost:8080',
+  'http://localhost:5173',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:8080',
+  'http://127.0.0.1:5173'
+];
+
 fastify.register(cors, {
-  origin: true, // Allow all origins temporarily for debugging
+  origin: (origin, cb) => {
+    if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+      cb(null, true);
+    } else {
+      cb(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
@@ -32,26 +48,6 @@ fastify.register(cors, {
   preflightContinue: false,
   optionsSuccessStatus: 204
 });
-
-// Alternative: Use specific origins (uncomment if needed)
-/*
-fastify.register(cors, {
-  origin: [
-    
-    'https://dm2comment.netlify.app',
-    'https://fastify-production-ebef.up.railway.app'
-  ],
-
-  
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
-  exposedHeaders: ['Content-Length', 'Content-Type'],
-  maxAge: 86400,
-  preflightContinue: false,
-  optionsSuccessStatus: 204
-});
-*/
 
 // Health check endpoint
 fastify.get('/health', async (request, reply) => {
@@ -1235,7 +1231,7 @@ const start = async () => {
       host: '0.0.0.0'  // Important for Railway/Docker deployments
     });
     console.log(`🚀 InstaAuto Backend (Fastify) running on port ${port}`);
-    console.log('✅ CORS configured for all origins (temporary for debugging)');
+    console.log('✅ CORS configured for production');
     console.log(`📡 Server is listening on all interfaces (0.0.0.0:${port})`);
   } catch (err) {
     fastify.log.error(err);
