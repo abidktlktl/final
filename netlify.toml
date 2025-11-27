@@ -10,6 +10,7 @@
 
 [build.environment]
   NODE_VERSION = "18"
+  VITE_API_URL = "https://final-production-cdd8.up.railway.app"
 
 # Redirect rules for SPA (Single Page Application)
 [[redirects]]
