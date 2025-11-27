@@ -282,15 +282,20 @@ class ApiService {
     const headers = getApiHeaders(this.getToken() || undefined);
     
     try {
+      console.log(`🔍 Fetching: ${url}`);
       const response = await fetch(url, {
         ...options,
         headers: {
           ...headers,
           ...options.headers,
         },
+        mode: 'cors',
+        credentials: 'include',
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`API Error Response: ${response.status} ${response.statusText}`, errorText);
         throw new Error(`API Error: ${response.status} ${response.statusText}`);
       }
 
