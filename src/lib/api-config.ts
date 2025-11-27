@@ -4,7 +4,7 @@ const isProduction = import.meta.env.PROD;
 
 // Get API URL from environment variable or use default
 // For production, use Railway backend; for development, use local backend
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://final-production-cdd8.up.railway.app';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://final-production-e2b7.up.railway.app';
 
 console.log('🔍 Environment Check:', {
   isDevelopment,
