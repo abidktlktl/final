@@ -29,8 +29,14 @@ console.log('🌍 Environment:', process.env.NODE_ENV || 'development');
     
     // Migrate existing data if needed
     if (process.env.AUTO_MIGRATE === 'true') {
-      const { migrateData } = require('./migrate-to-redis');
-      await migrateData();
+      try {
+        const { migrateData } = require('./migrate-to-redis');
+        await migrateData();
+        console.log('✅ Data migration completed successfully');
+      } catch (error) {
+        console.log('⚠️ Migration module not found or failed:', error.message);
+        console.log('   Server will continue without migration');
+      }
     }
   } catch (error) {
     console.error('⚠️ Redis connection failed, using fallback:', error.message);

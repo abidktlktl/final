@@ -6,6 +6,13 @@ const isProduction = import.meta.env.PROD;
 // For production, use Railway backend; for development, use local backend
 const API_BASE_URL = import.meta.env.VITE_API_URL || (isProduction ? 'https://final-production-cdd8.up.railway.app' : 'http://localhost:4000');
 
+console.log('🔍 Environment Check:', {
+  isDevelopment,
+  isProduction,
+  viteApiUrl: import.meta.env.VITE_API_URL,
+  finalApiUrl: API_BASE_URL
+});
+
 export const apiConfig = {
   baseUrl: API_BASE_URL,
   endpoints: {
