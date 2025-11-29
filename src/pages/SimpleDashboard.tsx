@@ -37,6 +37,7 @@ import { api } from "@/lib/api";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { SimpleBottomNav } from "@/components/SimpleBottomNav";
 import { SkeletonLoader, EmptyState, LoadingDots } from "@/components/SkeletonLoader";
+import { ReelAutomationForm } from "@/components/ReelAutomationForm";
 
 interface Reel {
   id: string;
@@ -860,248 +861,26 @@ const SimpleDashboard = () => {
                   <X className="w-5 h-5" />
                 </Button>
                 <h2 className="text-lg font-semibold text-gray-900">
-                  Automation Settings
+                  Setup Automation
                 </h2>
                 <div className="w-10"></div>
               </div>
             </div>
 
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto bg-gray-50">
-              <div className="p-6 space-y-6">
-                {/* Comment Reply Section */}
-                <div className="bg-white rounded-lg p-5 border border-gray-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h3 className="font-medium text-gray-900">Comment Auto-Reply</h3>
-                      <p className="text-sm text-gray-500 mt-1">Automatically reply to comments</p>
-                    </div>
-                    <Switch
-                      checked={commentReplyEnabled}
-                      onCheckedChange={setCommentReplyEnabled}
-                    />
-                  </div>
-                  {commentReplyEnabled && (
-                    <Textarea
-                      value={commentTemplate}
-                      onChange={(e) => setCommentTemplate(e.target.value)}
-                      placeholder="Enter your auto-reply message..."
-                      className="w-full border-gray-200 focus:border-purple-400 focus:ring-1 focus:ring-purple-400"
-                      rows={3}
-                    />
-                  )}
-                </div>
-
-                {/* Trigger Words Section */}
-                <div className="bg-white rounded-lg p-5 border border-gray-200">
-                  <h3 className="font-medium text-gray-900 mb-2">Trigger Words</h3>
-                  <p className="text-sm text-gray-500 mb-4">Reply only to comments containing these words</p>
-                  
-                  <div className="flex gap-2 mb-3">
-                    <Input
-                      value={newTriggerWord}
-                      onChange={(e) => setNewTriggerWord(e.target.value)}
-                      placeholder="Add trigger word..."
-                      className="flex-1"
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter' && newTriggerWord.trim()) {
-                          setTriggerWords([...triggerWords, newTriggerWord.trim()]);
-                          setNewTriggerWord("");
-                        }
-                      }}
-                    />
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        if (newTriggerWord.trim()) {
-                          setTriggerWords([...triggerWords, newTriggerWord.trim()]);
-                          setNewTriggerWord("");
-                        }
-                      }}
-                      className="bg-purple-600 hover:bg-purple-700 text-white"
-                    >
-                      Add
-                    </Button>
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-2">
-                    {triggerWords.map((word, index) => (
-                      <Badge
-                        key={index}
-                        variant="secondary"
-                        className="cursor-pointer hover:bg-gray-200"
-                        onClick={() => setTriggerWords(triggerWords.filter((_, i) => i !== index))}
-                      >
-                        {word}
-                        <X className="w-3 h-3 ml-1" />
-                      </Badge>
-                    ))}
-                    {triggerWords.length === 0 && (
-                      <span className="text-sm text-gray-400">No trigger words set</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Auto DM on Comment Section */}
-                <div className="bg-white rounded-lg p-5 border border-gray-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h3 className="font-medium text-gray-900">Auto DM on Comment</h3>
-                      <p className="text-sm text-gray-500 mt-1">Send DM when someone comments</p>
-                    </div>
-                    <Switch
-                      checked={autoDmOnComment}
-                      onCheckedChange={setAutoDmOnComment}
-                    />
-                  </div>
-                  
-                  {autoDmOnComment && (
-                    <div className="space-y-4">
-                      <div>
-                        <Label className="text-sm font-medium text-gray-700 mb-2">DM Message</Label>
-                        <Textarea
-                          value={dmOnCommentMessage}
-                          onChange={(e) => setDmOnCommentMessage(e.target.value)}
-                          placeholder="Thanks for commenting! 💬 Check your DMs for exclusive content..."
-                          className="w-full"
-                          rows={3}
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label className="text-sm font-medium text-gray-700 mb-2">DM Delay (seconds)</Label>
-                        <select 
-                          className="w-full p-2 border rounded-lg"
-                          value={dmOnCommentDelay}
-                          onChange={(e) => setDmOnCommentDelay(parseInt(e.target.value))}
-                        >
-                          <option value="0">Instant</option>
-                          <option value="5">5 seconds</option>
-                          <option value="10">10 seconds</option>
-                          <option value="30">30 seconds</option>
-                          <option value="60">1 minute</option>
-                        </select>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* DM Settings Section */}
-                <div className="bg-white rounded-lg p-5 border border-gray-200">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h3 className="font-medium text-gray-900">Follow-Based DMs</h3>
-                      <p className="text-sm text-gray-500 mt-1">Send personalized DMs based on follower status</p>
-                    </div>
-                    <Switch
-                      checked={followCheckEnabled}
-                      onCheckedChange={setFollowCheckEnabled}
-                    />
-                  </div>
-                  
-                  {followCheckEnabled && (
-                    <div className="space-y-4">
-                      <div>
-                        <Label className="text-sm font-medium text-gray-700 mb-2">For Followers</Label>
-                        <Textarea
-                          value={followerDmTemplate}
-                          onChange={(e) => setFollowerDmTemplate(e.target.value)}
-                          placeholder="Message for followers..."
-                          className="w-full"
-                          rows={2}
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label className="text-sm font-medium text-gray-700 mb-2">For Non-Followers</Label>
-                        <Textarea
-                          value={nonFollowerDmTemplate}
-                          onChange={(e) => setNonFollowerDmTemplate(e.target.value)}
-                          placeholder="Message for non-followers..."
-                          className="w-full"
-                          rows={2}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* CTA Buttons Section */}
-                <div className="bg-white rounded-lg p-5 border border-gray-200">
-                  <h3 className="font-medium text-gray-900 mb-2">Call-to-Action Buttons</h3>
-                  <p className="text-sm text-gray-500 mb-4">Add buttons to your DMs</p>
-                  
-                  <div className="space-y-2">
-                    {ctaButtons.map((button, index) => (
-                      <div key={index} className="flex gap-2">
-                        <Input
-                          value={button.text}
-                          onChange={(e) => {
-                            const newButtons = [...ctaButtons];
-                            newButtons[index].text = e.target.value;
-                            setCtaButtons(newButtons);
-                          }}
-                          placeholder="Button text"
-                          className="flex-1"
-                        />
-                        <Input
-                          value={button.url}
-                          onChange={(e) => {
-                            const newButtons = [...ctaButtons];
-                            newButtons[index].url = e.target.value;
-                            setCtaButtons(newButtons);
-                          }}
-                          placeholder="https://..."
-                          className="flex-1"
-                        />
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => setCtaButtons(ctaButtons.filter((_, i) => i !== index))}
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ))}
-                    
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCtaButtons([...ctaButtons, { text: "", url: "" }])}
-                      className="w-full"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Button
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Simple Bottom Actions */}
-            <div className="border-t bg-white px-6 py-4">
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => {
-                    setShowSidePanel(false);
-                    setTimeout(() => setSelectedReel(null), 300);
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
-                  onClick={() => {
-                    handleSaveAutomation('reel');
-                    setShowSidePanel(false);
-                    setTimeout(() => setSelectedReel(null), 300);
-                  }}
-                >
-                  Save Changes
-                </Button>
-              </div>
+            {/* Simplified Automation Form */}
+            <div className="flex-1 overflow-y-auto bg-gray-50 p-6">
+              <ReelAutomationForm
+                reelCaption={selectedReel.caption}
+                onSave={(automation) => {
+                  handleSaveAutomation('reel');
+                  setShowSidePanel(false);
+                  setTimeout(() => setSelectedReel(null), 300);
+                }}
+                onCancel={() => {
+                  setShowSidePanel(false);
+                  setTimeout(() => setSelectedReel(null), 300);
+                }}
+              />
             </div>
           </div>
         )}
