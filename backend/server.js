@@ -23,7 +23,8 @@ console.log('🌍 Environment:', process.env.NODE_ENV || 'development');
 
 // Register CORS plugin with specific origins for production
 const allowedOrigins = [
-  'https://final-production-cdd8.up.railway.app',
+  'https://dm2comment.netlify.app',
+  'https://final-production-e2b7.up.railway.app',
   'http://localhost:3000',
   'http://localhost:8080',
   'http://localhost:5173',
