@@ -3,7 +3,7 @@ import { ExecutionLogger } from './executionLogger.js';
 
 /**
  * Automation Engine
- * Processes triggers and executes automation actions
+ * Processes triggers and executes automation actions with variant support
  */
 export class AutomationEngine {
   /**
@@ -20,6 +20,11 @@ export class AutomationEngine {
         const matched = this.matchTrigger(automation, messageData);
 
         if (matched) {
+          // Apply delay if configured
+          if (automation.delayMs && automation.delayMs > 0) {
+            await new Promise(resolve => setTimeout(resolve, automation.delayMs));
+          }
+
           const result = await this.executeAction(automation, messageData, userId);
           results.push({
             automationId: automation.id,
@@ -127,16 +132,25 @@ export class AutomationEngine {
   }
 
   /**
-   * Send automated message
+   * Send automated message with variant support
+   * Supports multiple reply variants for non-bot-like behavior
    */
   static async sendMessage(automation, messageData) {
     // TODO: Integrate with Facebook/messaging service
     // This would call the actual messaging API
 
-    const message = this.substituteVariables(
-      automation.responseMessage || 'Auto-reply',
-      messageData
-    );
+    let messageText = automation.responseMessage || 'Auto-reply';
+    
+    // Support multiple variants for non-bot-like behavior
+    if (automation.commentReplyVariants && Array.isArray(automation.commentReplyVariants)) {
+      const variants = automation.commentReplyVariants.filter(v => v && v.trim());
+      if (variants.length > 0) {
+        // Select random variant
+        messageText = variants[Math.floor(Math.random() * variants.length)];
+      }
+    }
+
+    const message = this.substituteVariables(messageText, messageData);
 
     return {
       type: 'SEND_MESSAGE',

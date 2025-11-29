@@ -20,7 +20,10 @@ import {
   Bot,
   Zap,
   MessageSquare,
-  Users
+  Users,
+  AlertTriangle,
+  Copy,
+  Shuffle
 } from "lucide-react";
 
 interface KeywordResponse {
@@ -61,6 +64,18 @@ export function DmAutomationSettings() {
   const [newKeyword, setNewKeyword] = useState("");
   const [currentKeywords, setCurrentKeywords] = useState<string[]>([]);
   const [keywordResponse, setKeywordResponse] = useState("");
+  
+  // Comment reply variants
+  const [commentVariants, setCommentVariants] = useState<string[]>([
+    "Thanks for your comment! 🙏",
+    "Appreciate your feedback!",
+    "Thanks for engaging with us!",
+    "Love your comment! ✨"
+  ]);
+  const [newVariant, setNewVariant] = useState("");
+  const [commentDelayMs, setCommentDelayMs] = useState(5000);
+  const [maxRepliesPerDay, setMaxRepliesPerDay] = useState(100);
+  const [useRandomVariants, setUseRandomVariants] = useState(true);
 
   useEffect(() => {
     loadDmAutomation();
@@ -140,6 +155,23 @@ export function DmAutomationSettings() {
     });
   };
 
+  const addCommentVariant = () => {
+    if (newVariant.trim() && !commentVariants.includes(newVariant.trim())) {
+      setCommentVariants([...commentVariants, newVariant.trim()]);
+      setNewVariant("");
+    }
+  };
+
+  const removeCommentVariant = (index: number) => {
+    setCommentVariants(commentVariants.filter((_, i) => i !== index));
+  };
+
+  const duplicateVariant = (text: string) => {
+    if (!commentVariants.includes(text)) {
+      setCommentVariants([...commentVariants, text]);
+    }
+  };
+
   if (loading) {
     return (
       <Card>
@@ -154,6 +186,27 @@ export function DmAutomationSettings() {
 
   return (
     <div className="space-y-6">
+      {/* Risk Warning */}
+      <Card className="border-orange-200 bg-orange-50">
+        <CardContent className="p-4">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-orange-900">Automating Comment Replies - Stay Informed</h3>
+              <p className="text-sm text-orange-800 mt-1">
+                Automating comment replies comes with risks:
+              </p>
+              <ul className="text-sm text-orange-800 mt-2 ml-4 space-y-1 list-disc">
+                <li>Instagram may rate-limit or temporarily restrict your account</li>
+                <li>Too frequent responses can trigger spam detection</li>
+                <li>Patterns that look automated can harm your engagement</li>
+                <li>Use realistic delays and vary your responses</li>
+              </ul>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -166,7 +219,7 @@ export function DmAutomationSettings() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="welcome" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="welcome" className="flex items-center gap-2">
                 <UserPlus className="w-4 h-4" />
                 Welcome
@@ -178,6 +231,10 @@ export function DmAutomationSettings() {
               <TabsTrigger value="keywords" className="flex items-center gap-2">
                 <Hash className="w-4 h-4" />
                 Keywords
+              </TabsTrigger>
+              <TabsTrigger value="comments" className="flex items-center gap-2">
+                <MessageCircle className="w-4 h-4" />
+                Comments
               </TabsTrigger>
             </TabsList>
 
@@ -406,6 +463,133 @@ export function DmAutomationSettings() {
                       </CardContent>
                     </Card>
                   ))}
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="comments" className="space-y-4">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Comment Reply Variants</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Add multiple reply variants. One will be randomly selected for each reply to avoid looking like a bot.
+                  </p>
+                </div>
+
+                {/* Settings */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Settings</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2">
+                        <Shuffle className="w-4 h-4" />
+                        Use Random Variants
+                      </Label>
+                      <Switch
+                        checked={useRandomVariants}
+                        onCheckedChange={setUseRandomVariants}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        When enabled, a random variant will be selected for each reply
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        Delay Between Replies (ms)
+                      </Label>
+                      <Input
+                        type="number"
+                        min="1000"
+                        max="60000"
+                        step="1000"
+                        value={commentDelayMs}
+                        onChange={(e) => setCommentDelayMs(parseInt(e.target.value) || 5000)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Realistic delays (5000-30000ms) help avoid bot detection
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Max Replies Per Day</Label>
+                      <Input
+                        type="number"
+                        min="10"
+                        max="1000"
+                        value={maxRepliesPerDay}
+                        onChange={(e) => setMaxRepliesPerDay(parseInt(e.target.value) || 100)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Limit daily replies to avoid rate limiting
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Add variant */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Add Variant</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="space-y-2">
+                      <Label>Reply Text</Label>
+                      <Textarea
+                        placeholder="Type a reply variant..."
+                        value={newVariant}
+                        onChange={(e) => setNewVariant(e.target.value)}
+                        rows={2}
+                      />
+                    </div>
+                    <Button
+                      onClick={addCommentVariant}
+                      disabled={!newVariant.trim()}
+                      className="w-full"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Variant ({commentVariants.length})
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Existing variants */}
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-sm">Your Variants ({commentVariants.length})</h3>
+                  {commentVariants.map((variant, index) => (
+                    <Card key={index}>
+                      <CardContent className="p-4">
+                        <div className="flex justify-between items-start gap-2">
+                          <p className="text-sm flex-1">{variant}</p>
+                          <div className="flex gap-1">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => duplicateVariant(variant + " (copy)")}
+                              title="Duplicate variant"
+                            >
+                              <Copy className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeCommentVariant(index)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  {commentVariants.length === 0 && (
+                    <p className="text-sm text-muted-foreground p-3">No variants added yet</p>
+                  )}
                 </div>
               </div>
             </TabsContent>
