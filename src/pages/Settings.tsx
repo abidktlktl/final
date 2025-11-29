@@ -26,6 +26,7 @@ import { SimpleBottomNav } from "@/components/SimpleBottomNav";
 import { MessageTemplateModal } from "@/components/MessageTemplateModal";
 import { ProfileSettings } from "@/components/ProfileSettings";
 import { BillingPricing } from "@/components/BillingPricing";
+import { DmAutomationSettings } from "@/components/DmAutomationSettings";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Settings = () => {
@@ -35,6 +36,7 @@ const Settings = () => {
   const [showDMTemplates, setShowDMTemplates] = useState(false);
   const [showProfileSettings, setShowProfileSettings] = useState(false);
   const [showBillingPricing, setShowBillingPricing] = useState(false);
+  const [showDmAutomation, setShowDmAutomation] = useState(false);
 
   const handleExport = async () => {
     try {
@@ -154,7 +156,7 @@ const Settings = () => {
         </Card>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card 
             className="border border-gray-200 shadow-md hover:shadow-xl hover:border-purple-300 transition-all cursor-pointer bg-white group"
             onClick={() => setShowProfileSettings(true)}
@@ -187,6 +189,24 @@ const Settings = () => {
                   <p className="text-sm text-gray-500">Subscription management</p>
                 </div>
                 <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-green-600 transition-colors" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="border border-gray-200 shadow-md hover:shadow-xl hover:border-pink-300 transition-all cursor-pointer bg-white group"
+            onClick={() => setShowDmAutomation(true)}
+          >
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+                  <FileText className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg text-gray-900">DM Automation</h3>
+                  <p className="text-sm text-gray-500">Auto-reply settings</p>
+                </div>
+                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-pink-600 transition-colors" />
               </div>
             </CardContent>
           </Card>
@@ -396,6 +416,21 @@ const Settings = () => {
           <div className="bg-background rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <BillingPricing onClose={() => setShowBillingPricing(false)} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DM Automation Modal */}
+      {showDmAutomation && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-background rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold">DM Automation Settings</h2>
+                <Button variant="ghost" onClick={() => setShowDmAutomation(false)}>✕</Button>
+              </div>
+              <DmAutomationSettings />
             </div>
           </div>
         </div>
