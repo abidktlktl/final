@@ -111,7 +111,6 @@ const SimpleDashboard = () => {
   const [selectedAutomation, setSelectedAutomation] = useState<string | null>(null);
   const [showReelSelector, setShowReelSelector] = useState(false);
   const [showSidePanel, setShowSidePanel] = useState(false);
-  const [automationType, setAutomationType] = useState<"simple" | "advanced">("simple");
 
   useEffect(() => {
     const token = localStorage.getItem('instaauto-token');
@@ -869,61 +868,24 @@ const SimpleDashboard = () => {
               </div>
             </div>
 
-            {/* Automation Type Selector */}
-            <div className="border-b px-6 py-3 bg-white">
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant={automationType === "simple" ? "default" : "outline"}
-                  onClick={() => setAutomationType("simple")}
-                  className={automationType === "simple" ? "bg-purple-600" : ""}
-                >
-                  Simple
-                </Button>
-                <Button
-                  size="sm"
-                  variant={automationType === "advanced" ? "default" : "outline"}
-                  onClick={() => setAutomationType("advanced")}
-                  className={automationType === "advanced" ? "bg-purple-600" : ""}
-                >
-                  Advanced DM Flow
-                </Button>
-              </div>
-            </div>
-
-            {/* Simplified Automation Form */}
+            {/* Automation Form */}
             <div className="flex-1 overflow-y-auto bg-gray-50 p-6">
-              {automationType === "simple" ? (
-                <ReelAutomationForm
-                  reelCaption={selectedReel.caption}
-                  onSave={(automation) => {
-                    handleSaveAutomation('reel');
-                    setShowSidePanel(false);
-                    setTimeout(() => setSelectedReel(null), 300);
-                  }}
-                  onCancel={() => {
-                    setShowSidePanel(false);
-                    setTimeout(() => setSelectedReel(null), 300);
-                  }}
-                />
-              ) : (
-                <CommentDMAutomationForm
-                  reelCaption={selectedReel.caption}
-                  onSave={(automation) => {
-                    console.log("Advanced automation saved:", automation);
-                    toast({
-                      title: "✅ Advanced Automation Saved",
-                      description: "Multi-step DM sequence configured",
-                    });
-                    setShowSidePanel(false);
-                    setTimeout(() => setSelectedReel(null), 300);
-                  }}
-                  onCancel={() => {
-                    setShowSidePanel(false);
-                    setTimeout(() => setSelectedReel(null), 300);
-                  }}
-                />
-              )}
+              <CommentDMAutomationForm
+                reelCaption={selectedReel.caption}
+                onSave={(automation) => {
+                  console.log("Automation saved:", automation);
+                  toast({
+                    title: "✅ Automation Saved",
+                    description: "Comment DM sequence configured",
+                  });
+                  setShowSidePanel(false);
+                  setTimeout(() => setSelectedReel(null), 300);
+                }}
+                onCancel={() => {
+                  setShowSidePanel(false);
+                  setTimeout(() => setSelectedReel(null), 300);
+                }}
+              />
             </div>
           </div>
         )}

@@ -7,28 +7,25 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { AlertTriangle, Save, X, ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
+import { AlertTriangle, Save, ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
 
 interface CommentDMAutomation {
   enabled: boolean;
   triggerType: "any" | "keywords";
   keywords?: string[];
+  commentReplies: string[];
+  
   openingMessage: string;
   followCheckEnabled: boolean;
   followCheckMessage: string;
   followCheckRetries: number;
   continueAfterFollowCheck: "send" | "dont-send";
-  emailCaptureEnabled: boolean;
-  emailMessage: string;
+  
   primaryMessage: string;
   primaryButton: {
     text: string;
     url: string;
   };
-  followUpMessages?: Array<{
-    delay: number; // in minutes
-    message: string;
-  }>;
   delayMs: number;
 }
 
@@ -50,31 +47,33 @@ export function CommentDMAutomationForm({
       enabled: true,
       triggerType: "any",
       keywords: [],
+      commentReplies: [
+        "Thanks for your comment! 🙏",
+        "Appreciate the love! ❤️",
+        "Thanks for stopping by! 😊"
+      ],
       openingMessage: "Hey! I'm so glad you're here - thanks a ton for stopping by 😊\n\nTap below and I'll send you the access in just a moment ✨",
       followCheckEnabled: true,
       followCheckMessage: "Oops! Looks like you haven't followed me yet 👀\nIt would mean a lot if you could visit my profile and hit that follow button 😁",
       followCheckRetries: 3,
       continueAfterFollowCheck: "send",
-      emailCaptureEnabled: false,
-      emailMessage: "Before I send you the access, what's your email?",
       primaryMessage: "Hi there!\n\nAppreciate your comment 🙌 As promised, here's the link for you ⬇️",
       primaryButton: {
         text: "Get Access",
         url: "https://yourlink.com"
       },
-      followUpMessages: [],
       delayMs: 5000
     }
   );
 
   const [newKeyword, setNewKeyword] = useState("");
+  const [newReply, setNewReply] = useState("");
   const [expandedSections, setExpandedSections] = useState({
     trigger: true,
-    opening: true,
+    replies: true,
+    opening: false,
     followCheck: false,
-    email: false,
-    primary: false,
-    followUp: false
+    primary: false
   });
 
   const toggleSection = (section: keyof typeof expandedSections) => {
@@ -101,30 +100,28 @@ export function CommentDMAutomationForm({
     });
   };
 
-  const addFollowUpMessage = () => {
-    setAutomation({
-      ...automation,
-      followUpMessages: [
-        ...(automation.followUpMessages || []),
-        { delay: 5, message: "" }
-      ]
-    });
+  const addReply = () => {
+    if (newReply.trim() && !automation.commentReplies.includes(newReply.trim())) {
+      setAutomation({
+        ...automation,
+        commentReplies: [...automation.commentReplies, newReply.trim()]
+      });
+      setNewReply("");
+    }
   };
 
-  const updateFollowUpMessage = (index: number, field: string, value: number | string) => {
-    const updated = [...(automation.followUpMessages || [])];
-    updated[index] = { ...updated[index], [field]: value };
-    setAutomation({ ...automation, followUpMessages: updated });
-  };
-
-  const removeFollowUpMessage = (index: number) => {
+  const removeReply = (index: number) => {
     setAutomation({
       ...automation,
-      followUpMessages: automation.followUpMessages?.filter((_, i) => i !== index) || []
+      commentReplies: automation.commentReplies.filter((_, i) => i !== index)
     });
   };
 
   const handleSave = () => {
+    if (automation.commentReplies.length === 0) {
+      alert("Please add at least one comment reply");
+      return;
+    }
     if (!automation.openingMessage.trim()) {
       alert("Please enter opening message");
       return;
@@ -171,42 +168,39 @@ export function CommentDMAutomationForm({
         </Card>
       )}
 
-      {/* Trigger Type */}
+      {/* Trigger Type & Keywords */}
       <Card>
         <CardHeader className="pb-3 cursor-pointer" onClick={() => toggleSection('trigger')}>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base">1. Comment Trigger</CardTitle>
+            <CardTitle className="text-base">1. When to Reply?</CardTitle>
             {expandedSections.trigger ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </div>
         </CardHeader>
         {expandedSections.trigger && (
           <CardContent className="space-y-3">
-            <div>
-              <Label className="text-sm font-medium mb-2">When should this automation trigger?</Label>
-              <RadioGroup value={automation.triggerType} onValueChange={(value: string) =>
-                setAutomation({ ...automation, triggerType: value as "any" | "keywords" })
-              }>
-                <div className="flex items-center space-x-2 p-2 border rounded-lg hover:bg-gray-50">
-                  <RadioGroupItem value="any" id="trigger-any" />
-                  <Label htmlFor="trigger-any" className="cursor-pointer text-sm">
-                    Any Comment (reply to all comments)
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2 p-2 border rounded-lg hover:bg-gray-50">
-                  <RadioGroupItem value="keywords" id="trigger-keywords" />
-                  <Label htmlFor="trigger-keywords" className="cursor-pointer text-sm">
-                    Specific Keywords (reply only if keywords match)
-                  </Label>
-                </div>
-              </RadioGroup>
-            </div>
+            <RadioGroup value={automation.triggerType} onValueChange={(value: string) =>
+              setAutomation({ ...automation, triggerType: value as "any" | "keywords" })
+            }>
+              <div className="flex items-center space-x-2 p-2 border rounded-lg hover:bg-gray-50">
+                <RadioGroupItem value="any" id="trigger-any" />
+                <Label htmlFor="trigger-any" className="cursor-pointer text-sm">
+                  Any Comment (reply to all)
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2 p-2 border rounded-lg hover:bg-gray-50">
+                <RadioGroupItem value="keywords" id="trigger-keywords" />
+                <Label htmlFor="trigger-keywords" className="cursor-pointer text-sm">
+                  Specific Keywords Only
+                </Label>
+              </div>
+            </RadioGroup>
 
             {automation.triggerType === "keywords" && (
-              <div>
-                <Label className="text-sm font-medium mb-2">Keywords to trigger on</Label>
+              <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <Label className="text-sm font-medium mb-2 block">Add keywords to watch for</Label>
                 <div className="flex gap-2 mb-2">
                   <Input
-                    placeholder="Enter keyword..."
+                    placeholder="e.g. price, info, buy..."
                     value={newKeyword}
                     onChange={(e) => setNewKeyword(e.target.value)}
                     onKeyPress={(e) => {
@@ -233,17 +227,60 @@ export function CommentDMAutomationForm({
         )}
       </Card>
 
-      {/* Opening Message */}
+      {/* Comment Replies */}
+      <Card>
+        <CardHeader className="pb-3 cursor-pointer" onClick={() => toggleSection('replies')}>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base">2. Comment Replies (Random Selection)</CardTitle>
+            {expandedSections.replies ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </div>
+        </CardHeader>
+        {expandedSections.replies && (
+          <CardContent className="space-y-3">
+            <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+              <p className="text-xs font-semibold text-purple-900 mb-2">✨ Add 2+ Different Replies</p>
+              <p className="text-xs text-purple-800">One will be randomly selected for each comment</p>
+            </div>
+            <div className="flex gap-2">
+              <Textarea
+                placeholder="Enter a comment reply..."
+                value={newReply}
+                onChange={(e) => setNewReply(e.target.value)}
+                rows={2}
+                className="text-sm"
+              />
+              <Button size="sm" onClick={addReply} className="px-3 h-fit">Add</Button>
+            </div>
+            <div className="space-y-2">
+              {automation.commentReplies.map((reply, index) => (
+                <div key={index} className="p-3 bg-gray-50 rounded-lg border border-gray-200 flex items-start justify-between gap-2">
+                  <p className="text-sm text-gray-800 flex-1">{reply}</p>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => removeReply(index)}
+                    className="hover:bg-red-100 hover:text-red-600 flex-shrink-0"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
+      {/* Opening Message (for DM) */}
       <Card>
         <CardHeader className="pb-3 cursor-pointer" onClick={() => toggleSection('opening')}>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base">2. Opening Message</CardTitle>
+            <CardTitle className="text-base">3. Opening DM Message</CardTitle>
             {expandedSections.opening ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </div>
         </CardHeader>
         {expandedSections.opening && (
           <CardContent className="space-y-2">
-            <Label className="text-xs text-gray-600">First DM when they comment</Label>
+            <Label className="text-xs text-gray-600">First message they receive after commenting</Label>
             <Textarea
               value={automation.openingMessage}
               onChange={(e) =>
@@ -252,7 +289,7 @@ export function CommentDMAutomationForm({
               rows={3}
               className="text-sm"
             />
-            <p className="text-xs text-gray-500">Example: "Hey! I'm so glad you're here - thanks a ton for stopping by 😊"</p>
+            <p className="text-xs text-gray-500">💡 This DM is sent right after they comment</p>
           </CardContent>
         )}
       </Card>
@@ -261,7 +298,7 @@ export function CommentDMAutomationForm({
       <Card>
         <CardHeader className="pb-3 cursor-pointer" onClick={() => toggleSection('followCheck')}>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base">3. Follow Check (Optional)</CardTitle>
+            <CardTitle className="text-base">4. Follow Check (Optional)</CardTitle>
             <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
               {expandedSections.followCheck ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               <Switch
@@ -298,54 +335,23 @@ export function CommentDMAutomationForm({
                 }
                 className="text-sm"
               />
-              <p className="text-xs text-gray-500 mt-1">After retries, will {automation.continueAfterFollowCheck === "send" ? "send" : "not send"} main DM</p>
+              <p className="text-xs text-gray-500 mt-1">After {automation.followCheckRetries} retries, will {automation.continueAfterFollowCheck === "send" ? "send" : "not send"} main DM</p>
             </div>
             <div>
-              <Label className="text-sm font-medium">After {automation.followCheckRetries} retries:</Label>
+              <Label className="text-sm font-medium mb-2">If still not following:</Label>
               <RadioGroup value={automation.continueAfterFollowCheck} onValueChange={(value: string) =>
                 setAutomation({ ...automation, continueAfterFollowCheck: value as "send" | "dont-send" })
               }>
                 <div className="flex items-center space-x-2 p-2 border rounded-lg hover:bg-gray-50">
                   <RadioGroupItem value="send" id="continue-send" />
-                  <Label htmlFor="continue-send" className="cursor-pointer text-sm">Send main DM anyway</Label>
+                  <Label htmlFor="continue-send" className="cursor-pointer text-sm">Send offer anyway</Label>
                 </div>
                 <div className="flex items-center space-x-2 p-2 border rounded-lg hover:bg-gray-50">
                   <RadioGroupItem value="dont-send" id="continue-dont-send" />
-                  <Label htmlFor="continue-dont-send" className="cursor-pointer text-sm">Don't send if not followed</Label>
+                  <Label htmlFor="continue-dont-send" className="cursor-pointer text-sm">Don't send offer</Label>
                 </div>
               </RadioGroup>
             </div>
-          </CardContent>
-        )}
-      </Card>
-
-      {/* Email Capture */}
-      <Card>
-        <CardHeader className="pb-3 cursor-pointer" onClick={() => toggleSection('email')}>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base">4. Email Capture (Optional)</CardTitle>
-            <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-              {expandedSections.email ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-              <Switch
-                checked={automation.emailCaptureEnabled}
-                onCheckedChange={(checked) =>
-                  setAutomation({ ...automation, emailCaptureEnabled: checked })
-                }
-              />
-            </div>
-          </div>
-        </CardHeader>
-        {expandedSections.email && automation.emailCaptureEnabled && (
-          <CardContent className="space-y-2">
-            <Label className="text-xs text-gray-600">Message asking for email</Label>
-            <Textarea
-              value={automation.emailMessage}
-              onChange={(e) =>
-                setAutomation({ ...automation, emailMessage: e.target.value })
-              }
-              rows={2}
-              className="text-sm"
-            />
           </CardContent>
         )}
       </Card>
@@ -354,14 +360,14 @@ export function CommentDMAutomationForm({
       <Card>
         <CardHeader className="pb-3 cursor-pointer" onClick={() => toggleSection('primary')}>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-base">5. Primary Message with CTA</CardTitle>
+            <CardTitle className="text-base">5. Main Offer + Link</CardTitle>
             {expandedSections.primary ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </div>
         </CardHeader>
         {expandedSections.primary && (
           <CardContent className="space-y-3">
             <div>
-              <Label className="text-xs text-gray-600 mb-2">Main message</Label>
+              <Label className="text-xs text-gray-600 mb-2">Your offer message</Label>
               <Textarea
                 value={automation.primaryMessage}
                 onChange={(e) =>
@@ -382,6 +388,7 @@ export function CommentDMAutomationForm({
                   })
                 }
                 className="text-sm"
+                placeholder="e.g. Get Access"
               />
             </div>
             <div>
@@ -398,66 +405,6 @@ export function CommentDMAutomationForm({
                 className="text-sm"
               />
             </div>
-          </CardContent>
-        )}
-      </Card>
-
-      {/* Follow-up Messages */}
-      <Card>
-        <CardHeader className="pb-3 cursor-pointer" onClick={() => toggleSection('followUp')}>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base">6. Follow-up Messages (Optional)</CardTitle>
-            {expandedSections.followUp ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          </div>
-        </CardHeader>
-        {expandedSections.followUp && (
-          <CardContent className="space-y-3">
-            {(automation.followUpMessages || []).map((msg, index) => (
-              <div key={index} className="p-3 border rounded-lg space-y-2">
-                <div className="flex justify-between items-center">
-                  <Label className="text-xs font-semibold">Follow-up #{index + 1}</Label>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => removeFollowUpMessage(index)}
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </Button>
-                </div>
-                <div>
-                  <Label className="text-xs text-gray-600">Delay (minutes)</Label>
-                  <Input
-                    type="number"
-                    min="1"
-                    value={msg.delay}
-                    onChange={(e) =>
-                      updateFollowUpMessage(index, "delay", parseInt(e.target.value))
-                    }
-                    className="text-sm"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs text-gray-600">Message</Label>
-                  <Textarea
-                    value={msg.message}
-                    onChange={(e) =>
-                      updateFollowUpMessage(index, "message", e.target.value)
-                    }
-                    rows={2}
-                    className="text-sm"
-                  />
-                </div>
-              </div>
-            ))}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={addFollowUpMessage}
-              className="w-full text-xs"
-            >
-              <Plus className="w-3 h-3 mr-1" />
-              Add Follow-up Message
-            </Button>
           </CardContent>
         )}
       </Card>
