@@ -94,7 +94,7 @@ const SimpleDashboard = () => {
   const [dmOnCommentDelay, setDmOnCommentDelay] = useState(5);
   
   // Advanced Settings
-  const [responseDelay, setResponseDelay] = useState(0); // in seconds
+  const [responseDelay, setResponseDelay] = useState(0);
   const [dailyLimit, setDailyLimit] = useState(100);
   
   // Trigger Words
@@ -128,7 +128,6 @@ const SimpleDashboard = () => {
         api.setToken(token);
       }
 
-      // Fetch real Instagram reels
       const [reelsData, automationData] = await Promise.all([
         api.getReels().catch(err => {
           console.error('Failed to load reels:', err);
@@ -148,7 +147,6 @@ const SimpleDashboard = () => {
       setReels(reelsData);
       setAutomations(automationData.reels || {});
       
-      // Calculate stats
       const activeCount = Object.keys(automationData.reels || {}).length;
       setStats({
         totalAutomations: activeCount,
@@ -182,7 +180,6 @@ const SimpleDashboard = () => {
   const handleSaveAutomation = async (type: string) => {
     try {
       if (type === 'reel' && selectedReel) {
-        // Save automation for selected reel
         const automationData = {
           comment: commentTemplate,
           follower_message: followerDmTemplate,
@@ -199,7 +196,6 @@ const SimpleDashboard = () => {
         
         await api.saveReelAutomation(selectedReel.id, automationData);
         
-        // Update local state
         setAutomations(prev => ({
           ...prev,
           [selectedReel.id]: automationData
@@ -212,7 +208,6 @@ const SimpleDashboard = () => {
         
         setSelectedReel(null);
       } else {
-        // Save general automation settings
         toast({
           title: "✅ Settings Saved",
           description: `Your ${type} settings have been updated!`,
@@ -385,411 +380,188 @@ const SimpleDashboard = () => {
           )}
         </div>
 
-        {/* Two Column Layout for Desktop */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Left Column - Reels Selection (2/3 width on desktop) */}
-          <div className="lg:col-span-2">
-            {/* Reels Selection Section */}
-            <Card className="border-0 shadow-xl bg-white overflow-hidden">
-              <CardHeader className="border-b bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2 text-2xl font-bold text-gray-900">
-                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                        <Play className="w-4 h-4 text-white" />
-                      </div>
-                      Your Instagram Reels
-                    </CardTitle>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Click on any reel to configure its automation
-                    </p>
+        {/* Reels Selection Section */}
+        <Card className="border-0 shadow-xl bg-white overflow-hidden">
+          <CardHeader className="border-b bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2 text-2xl font-bold text-gray-900">
+                  <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                    <Play className="w-4 h-4 text-white" />
                   </div>
-                  <Button
-                    onClick={refreshReels}
-                    variant="outline"
-                    size="sm"
-                    className="flex items-center gap-2 border-gray-300 hover:border-purple-400 hover:text-purple-600 transition-colors"
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                    Refresh
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6">
-                {reels.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="w-20 h-20 bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl flex items-center justify-center mx-auto mb-4">
-                      <Play className="w-10 h-10 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-xl mb-2">No Reels Found</h3>
-                    <p className="text-gray-600 mb-6 max-w-sm mx-auto">
-                      Connect your Instagram account or create some reels to get started with automation
-                    </p>
-                    <Button
-                      onClick={refreshReels}
-                      className="bg-gradient-to-r from-purple-600 to-pink-600 text-white"
-                    >
-                      <RefreshCw className="w-4 h-4 mr-2" />
-                      Load Reels
-                    </Button>
-                  </div>
-                ) : (
-                  <div>
-                    {/* Reels Stats Bar */}
-                    <div className="flex items-center justify-between mb-6 p-5 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-                      <div className="flex items-center gap-8">
-                        <div>
-                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Total Reels</p>
-                          <p className="text-2xl font-bold text-gray-900 mt-1">{reels.length}</p>
-                        </div>
-                        <div className="h-10 w-px bg-gray-300"></div>
-                        <div>
-                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Automated</p>
-                          <p className="text-2xl font-bold text-green-600 mt-1">
-                            {Object.keys(automations).length}
-                          </p>
-                        </div>
-                        <div className="h-10 w-px bg-gray-300"></div>
-                        <div>
-                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Pending</p>
-                          <p className="text-2xl font-bold text-amber-600 mt-1">
-                            {reels.length - Object.keys(automations).length}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Reels Grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                      {reels.map((reel) => {
-                        const hasAutomation = !!automations[reel.id];
-                        return (
-                          <div
-                            key={reel.id}
-                            className="relative group cursor-pointer transform transition-transform hover:scale-105"
-                            onClick={() => {
-                              setSelectedReel(reel);
-                              setShowSidePanel(true);
-                              // Load existing automation data if available
-                              const existing = automations[reel.id];
-                              if (existing) {
-                                setCommentTemplate(existing.comment || "Thanks for your comment! 🙏");
-                                setFollowerDmTemplate(existing.follower_message || "Welcome! Here's your exclusive content: [link]");
-                                setNonFollowerDmTemplate(existing.non_follower_message || "Thanks! Follow us for exclusive content 👆");
-                                setTriggerWords(existing.triggerWords || ['price', 'info', 'details', 'buy']);
-                                setCtaButtons(existing.buttons || [{ text: "Shop Now", url: "https://yourstore.com" }]);
-                                setAutoDmOnComment(existing.autoDmOnComment || false);
-                                setDmOnCommentMessage(existing.dmOnCommentMessage || "Thanks for commenting! 💬 Check your DMs for exclusive content 🎁");
-                                setDmOnCommentDelay(existing.dmOnCommentDelay || 5);
-                              }
-                            }}
-                          >
-                            <div className="aspect-[9/16] bg-gray-100 rounded-xl overflow-hidden shadow-lg">
-                              {reel.thumbnail && reel.thumbnail !== '/placeholder.svg' ? (
-                                <img
-                                  src={reel.thumbnail}
-                                  alt={reel.caption}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <div className="w-full h-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
-                                  <Play className="w-10 h-10 text-purple-600" />
-                                </div>
-                              )}
-                              
-                              {/* Button container - centered and appears on hover */}
-                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                <Button
-                                  size="sm"
-                                  className="bg-white hover:bg-gray-100 text-gray-900 font-semibold shadow-lg transition-all px-4"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedReel(reel);
-                                    setShowSidePanel(true);
-                                    // Load existing automation data if available
-                                    const existing = automations[reel.id];
-                                    if (existing) {
-                                      setCommentTemplate(existing.comment || "Thanks for your comment! 🙏");
-                                      setFollowerDmTemplate(existing.follower_message || "Welcome! Here's your exclusive content: [link]");
-                                      setNonFollowerDmTemplate(existing.non_follower_message || "Thanks! Follow us for exclusive content 👆");
-                                      setTriggerWords(existing.triggerWords || ['price', 'info', 'details', 'buy']);
-                                      setCtaButtons(existing.buttons || [{ text: "Shop Now", url: "https://yourstore.com" }]);
-                                    }
-                                  }}
-                                >
-                                  {hasAutomation ? (
-                                    <>
-                                      <Settings className="w-3 h-3 mr-1" />
-                                      Edit Automation
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Plus className="w-3 h-3 mr-1" />
-                                      Setup Automation
-                                    </>
-                                  )}
-                                </Button>
-                              </div>
-                              
-                              {/* Status Badge */}
-                              {hasAutomation && (
-                                <div className="absolute top-2 right-2">
-                                  <Badge className="bg-green-500 text-white border-0 shadow-md px-2 py-1">
-                                    <CheckCircle2 className="w-3 h-3 mr-1" />
-                                    Active
-                                  </Badge>
-                                </div>
-                              )}
-                              
-                              {/* Real Data Indicator */}
-                              {reel.isRealData && (
-                                <div className="absolute top-2 left-2">
-                                  <Badge className="bg-blue-500 text-white border-0 text-xs shadow-md px-2 py-1">
-                                    LIVE
-                                  </Badge>
-                                </div>
-                              )}
-                            </div>
-                            
-                            {/* Caption & Info */}
-                            <div className="mt-2">
-                              <p className="text-xs font-medium line-clamp-1 text-gray-800">
-                                {reel.caption || 'No caption'}
-                              </p>
-                              {reel.timestamp && (
-                                <p className="text-xs text-gray-500 mt-1">
-                                  {new Date(reel.timestamp).toLocaleDateString()}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Right Column - Automation Flow (1/3 width on desktop) */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Automation Flow Card */}
-            <Card className="border-0 shadow-xl bg-white overflow-hidden">
-              <CardHeader className="bg-gradient-to-br from-purple-600 to-pink-600 text-white px-6 py-4">
-                <CardTitle className="flex items-center gap-2 text-xl font-bold">
-                  <div className="w-8 h-8 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
-                    <Bot className="w-5 h-5 text-white" />
-                  </div>
-                  Automation Flow
+                  Your Instagram Reels
                 </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-              <div className="space-y-4">
-                {/* Step 1: Comment Reply with Triggers */}
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <MessageCircle className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold">Auto-Reply to Comments</h3>
-                        <p className="text-sm text-gray-600">Reply with triggers</p>
-                      </div>
-                      <Switch
-                        checked={commentReplyEnabled}
-                        onCheckedChange={setCommentReplyEnabled}
-                      />
+                <p className="text-sm text-gray-500 mt-1">
+                  Click on any reel to configure its automation
+                </p>
+              </div>
+              <Button
+                onClick={refreshReels}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2 border-gray-300 hover:border-purple-400 hover:text-purple-600 transition-colors"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Refresh
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            {reels.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-20 h-20 bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                  <Play className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="font-semibold text-xl mb-2">No Reels Found</h3>
+                <p className="text-gray-600 mb-6 max-w-sm mx-auto">
+                  Connect your Instagram account or create some reels to get started with automation
+                </p>
+                <Button
+                  onClick={refreshReels}
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white"
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Load Reels
+                </Button>
+              </div>
+            ) : (
+              <div>
+                {/* Reels Stats Bar */}
+                <div className="flex items-center justify-between mb-6 p-5 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+                  <div className="flex items-center gap-8">
+                    <div>
+                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Total Reels</p>
+                      <p className="text-2xl font-bold text-gray-900 mt-1">{reels.length}</p>
                     </div>
-                    {commentReplyEnabled && (
-                      <div className="mt-3 space-y-2">
-                        <div className="p-3 bg-purple-50 rounded-lg">
-                          <p className="text-xs font-semibold text-purple-700 mb-1">Reply Template:</p>
-                          <p className="text-sm text-purple-600">{commentTemplate}</p>
-                        </div>
-                        {triggerWords.length > 0 && (
-                          <div className="p-2 bg-gray-50 rounded-lg">
-                            <p className="text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1">
-                              <Hash className="w-3 h-3" />
-                              Trigger Words:
-                            </p>
-                            <div className="flex flex-wrap gap-1">
-                              {triggerWords.slice(0, 3).map((word, i) => (
-                                <Badge key={i} className="text-xs bg-purple-100 text-purple-700 border-0">
-                                  {word}
-                                </Badge>
-                              ))}
-                              {triggerWords.length > 3 && (
-                                <Badge className="text-xs bg-gray-200 text-gray-600 border-0">
-                                  +{triggerWords.length - 3} more
-                                </Badge>
+                    <div className="h-10 w-px bg-gray-300"></div>
+                    <div>
+                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Automated</p>
+                      <p className="text-2xl font-bold text-green-600 mt-1">
+                        {Object.keys(automations).length}
+                      </p>
+                    </div>
+                    <div className="h-10 w-px bg-gray-300"></div>
+                    <div>
+                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Pending</p>
+                      <p className="text-2xl font-bold text-amber-600 mt-1">
+                        {reels.length - Object.keys(automations).length}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Reels Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {reels.map((reel) => {
+                    const hasAutomation = !!automations[reel.id];
+                    return (
+                      <div
+                        key={reel.id}
+                        className="relative group cursor-pointer transform transition-transform hover:scale-105"
+                        onClick={() => {
+                          setSelectedReel(reel);
+                          setShowSidePanel(true);
+                          const existing = automations[reel.id];
+                          if (existing) {
+                            setCommentTemplate(existing.comment || "Thanks for your comment! 🙏");
+                            setFollowerDmTemplate(existing.follower_message || "Welcome! Here's your exclusive content: [link]");
+                            setNonFollowerDmTemplate(existing.non_follower_message || "Thanks! Follow us for exclusive content 👆");
+                            setTriggerWords(existing.triggerWords || ['price', 'info', 'details', 'buy']);
+                            setCtaButtons(existing.buttons || [{ text: "Shop Now", url: "https://yourstore.com" }]);
+                            setAutoDmOnComment(existing.autoDmOnComment || false);
+                            setDmOnCommentMessage(existing.dmOnCommentMessage || "Thanks for commenting! 💬 Check your DMs for exclusive content 🎁");
+                            setDmOnCommentDelay(existing.dmOnCommentDelay || 5);
+                          }
+                        }}
+                      >
+                        <div className="aspect-[9/16] bg-gray-100 rounded-xl overflow-hidden shadow-lg">
+                          {reel.thumbnail && reel.thumbnail !== '/placeholder.svg' ? (
+                            <img
+                              src={reel.thumbnail}
+                              alt={reel.caption}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
+                              <Play className="w-10 h-10 text-purple-600" />
+                            </div>
+                          )}
+                          
+                          {/* Button container - centered and appears on hover */}
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                            <Button
+                              size="sm"
+                              className="bg-white hover:bg-gray-100 text-gray-900 font-semibold shadow-lg transition-all px-4"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedReel(reel);
+                                setShowSidePanel(true);
+                                const existing = automations[reel.id];
+                                if (existing) {
+                                  setCommentTemplate(existing.comment || "Thanks for your comment! 🙏");
+                                  setFollowerDmTemplate(existing.follower_message || "Welcome! Here's your exclusive content: [link]");
+                                  setNonFollowerDmTemplate(existing.non_follower_message || "Thanks! Follow us for exclusive content 👆");
+                                  setTriggerWords(existing.triggerWords || ['price', 'info', 'details', 'buy']);
+                                  setCtaButtons(existing.buttons || [{ text: "Shop Now", url: "https://yourstore.com" }]);
+                                }
+                              }}
+                            >
+                              {hasAutomation ? (
+                                <>
+                                  <Settings className="w-3 h-3 mr-1" />
+                                  Edit Automation
+                                </>
+                              ) : (
+                                <>
+                                  <Plus className="w-3 h-3 mr-1" />
+                                  Setup Automation
+                                </>
                               )}
+                            </Button>
+                          </div>
+                          
+                          {/* Status Badge */}
+                          {hasAutomation && (
+                            <div className="absolute top-2 right-2">
+                              <Badge className="bg-green-500 text-white border-0 shadow-md px-2 py-1">
+                                <CheckCircle2 className="w-3 h-3 mr-1" />
+                                Active
+                              </Badge>
                             </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Arrow */}
-                <div className="flex items-center justify-center">
-                  <div className="w-0.5 h-8 bg-gray-300"></div>
-                </div>
-
-                {/* Step 2: Follow Check */}
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Target className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold">Smart Follow Detection</h3>
-                        <p className="text-sm text-gray-600">Check if commenter follows you</p>
-                      </div>
-                      <Switch
-                        checked={followCheckEnabled}
-                        onCheckedChange={setFollowCheckEnabled}
-                      />
-                    </div>
-                    {followCheckEnabled && (
-                      <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Check className="w-4 h-4 text-green-600" />
-                            <span className="text-sm font-semibold text-green-700">If Following</span>
-                          </div>
-                          <p className="text-xs text-green-600">Send welcome DM with exclusive content</p>
+                          )}
+                          
+                          {/* Real Data Indicator */}
+                          {reel.isRealData && (
+                            <div className="absolute top-2 left-2">
+                              <Badge className="bg-blue-500 text-white border-0 text-xs shadow-md px-2 py-1">
+                                LIVE
+                              </Badge>
+                            </div>
+                          )}
                         </div>
-                        <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
-                          <div className="flex items-center gap-2 mb-2">
-                            <X className="w-4 h-4 text-orange-600" />
-                            <span className="text-sm font-semibold text-orange-700">If Not Following</span>
-                          </div>
-                          <p className="text-xs text-orange-600">Send follow invitation with CTA button</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Arrow */}
-                <div className="flex items-center justify-center">
-                  <div className="w-0.5 h-8 bg-gray-300"></div>
-                </div>
-
-                {/* Step 3: Send DM with CTA */}
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Send className="w-5 h-5 text-pink-600" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold">Personalized DM</h3>
-                        <p className="text-sm text-gray-600">With CTA buttons</p>
-                      </div>
-                      <Switch
-                        checked={dmAutomationEnabled}
-                        onCheckedChange={setDmAutomationEnabled}
-                      />
-                    </div>
-                    {dmAutomationEnabled && (
-                      <div className="mt-3 space-y-2">
-                        <div className="p-3 bg-green-50 rounded-lg">
-                          <p className="text-xs font-semibold text-green-700 mb-1">Follower DM:</p>
-                          <p className="text-xs text-green-600 line-clamp-2">{followerDmTemplate}</p>
-                        </div>
-                        <div className="p-3 bg-orange-50 rounded-lg">
-                          <p className="text-xs font-semibold text-orange-700 mb-1">Non-Follower DM:</p>
-                          <p className="text-xs text-orange-600 line-clamp-2">{nonFollowerDmTemplate}</p>
-                        </div>
-                        {ctaButtons.filter(b => b.text).length > 0 && (
-                          <div className="p-2 bg-gray-50 rounded-lg">
-                            <p className="text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1">
-                              <MousePointer className="w-3 h-3" />
-                              CTA Buttons:
+                        
+                        {/* Caption & Info */}
+                        <div className="mt-2">
+                          <p className="text-xs font-medium line-clamp-1 text-gray-800">
+                            {reel.caption || 'No caption'}
+                          </p>
+                          {reel.timestamp && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              {new Date(reel.timestamp).toLocaleDateString()}
                             </p>
-                            <div className="flex flex-wrap gap-1">
-                              {ctaButtons.filter(b => b.text).map((btn, i) => (
-                                <Button key={i} size="sm" className="h-6 px-2 text-xs bg-gradient-to-r from-purple-600 to-pink-600 text-white">
-                                  {btn.text}
-                                </Button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
-                    )}
-                  </div>
+                    );
+                  })}
                 </div>
               </div>
-              </CardContent>
-            </Card>
-
-            {/* Quick Actions */}
-            <div className="grid grid-cols-1 gap-3">
-              <Card 
-                className="border border-gray-200 shadow-md hover:shadow-lg hover:border-purple-300 transition-all cursor-pointer bg-white group"
-                onClick={() => setSelectedAutomation('comment')}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-                      <MessageCircle className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-sm text-gray-900">Comment Reply</h3>
-                      <p className="text-xs text-gray-500">Configure auto-reply message</p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card 
-                className="border border-gray-200 shadow-md hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer bg-white group"
-                onClick={() => setSelectedAutomation('dm')}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-                      <Send className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-sm text-gray-900">DM Templates</h3>
-                      <p className="text-xs text-gray-500">Personalized messages</p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card 
-                className="border border-gray-200 shadow-md hover:shadow-lg hover:border-pink-300 transition-all cursor-pointer bg-white group"
-                onClick={() => setSelectedAutomation('settings')}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-                      <Settings className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-sm text-gray-900">Advanced Settings</h3>
-                      <p className="text-xs text-gray-500">Delays, limits & more</p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-pink-600 transition-colors" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Recent Activity */}
-        <Card className="border-0 shadow-xl bg-white">
+        <Card className="border-0 shadow-xl bg-white mt-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="w-5 h-5 text-gray-600" />
