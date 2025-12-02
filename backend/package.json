@@ -4,9 +4,9 @@
   "description": "Backend for Instagram Automation System",
   "main": "server.js",
   "scripts": {
-    "start": "node server-redis.js",
+    "start": "node server.js",
     "start:legacy": "node server.js",
-    "dev": "nodemon server-redis.js",
+    "dev": "nodemon server.js",
     "dev:legacy": "nodemon server.js",
     "migrate": "node migrate-to-redis.js",
     "test:redis": "node test-redis-connection.js",

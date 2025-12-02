@@ -36,8 +36,7 @@ import { toast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { SimpleBottomNav } from "@/components/SimpleBottomNav";
-import { SkeletonLoader, EmptyState, LoadingDots } from "@/components/SkeletonLoader";
-import { ReelAutomationForm } from "@/components/ReelAutomationForm";
+import { SkeletonLoader, LoadingDots } from "@/components/SkeletonLoader";
 import { CommentDMAutomationForm } from "@/components/CommentDMAutomationForm";
 
 interface Reel {
@@ -287,7 +286,7 @@ const SimpleDashboard = () => {
       await Promise.all(promises);
 
       // Update local state
-      const newAutomations: Record<string, any> = {};
+      const newAutomations: Record<string, Automation> = {};
       reels.forEach(reel => {
         newAutomations[reel.id] = automationData;
       });
