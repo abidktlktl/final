@@ -111,6 +111,13 @@ const SimpleDashboard = () => {
   const [selectedAutomation, setSelectedAutomation] = useState<string | null>(null);
   const [showReelSelector, setShowReelSelector] = useState(false);
   const [showSidePanel, setShowSidePanel] = useState(false);
+  const [showBulkApplyModal, setShowBulkApplyModal] = useState(false);
+  const [bulkApplyCommentReplies, setBulkApplyCommentReplies] = useState<string[]>([
+    "Thanks for your comment! 🙏",
+    "Appreciate the love! ❤️",
+    "Thanks for stopping by! 😊"
+  ]);
+  const [bulkApplyNewReply, setBulkApplyNewReply] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem('instaauto-token');
@@ -244,6 +251,73 @@ const SimpleDashboard = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleApplyToAllReels = async () => {
+    if (bulkApplyCommentReplies.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please add at least one comment reply",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const automationData = {
+        comment: bulkApplyCommentReplies[0],
+        commentReplies: bulkApplyCommentReplies,
+        follower_message: followerDmTemplate,
+        non_follower_message: nonFollowerDmTemplate,
+        followBefore: followCheckEnabled,
+        triggerWords: triggerWords,
+        buttons: ctaButtons,
+        responseDelay: responseDelay,
+        dailyLimit: dailyLimit,
+        autoDmOnComment: autoDmOnComment,
+        dmOnCommentMessage: dmOnCommentMessage,
+        dmOnCommentDelay: dmOnCommentDelay
+      };
+
+      // Apply to all reels
+      const promises = reels.map(reel =>
+        api.saveReelAutomation(reel.id, automationData)
+      );
+
+      await Promise.all(promises);
+
+      // Update local state
+      const newAutomations: Record<string, any> = {};
+      reels.forEach(reel => {
+        newAutomations[reel.id] = automationData;
+      });
+      setAutomations(newAutomations);
+
+      toast({
+        title: "✅ Automation Applied",
+        description: `Automation successfully applied to all ${reels.length} reels!`,
+      });
+
+      setShowBulkApplyModal(false);
+    } catch (error) {
+      console.error("Error applying automation to all reels:", error);
+      toast({
+        title: "Error",
+        description: "Failed to apply automation to all reels",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const addBulkReply = () => {
+    if (bulkApplyNewReply.trim() && !bulkApplyCommentReplies.includes(bulkApplyNewReply.trim())) {
+      setBulkApplyCommentReplies([...bulkApplyCommentReplies, bulkApplyNewReply.trim()]);
+      setBulkApplyNewReply("");
+    }
+  };
+
+  const removeBulkReply = (index: number) => {
+    setBulkApplyCommentReplies(bulkApplyCommentReplies.filter((_, i) => i !== index));
   };
 
   if (loading) {
@@ -395,15 +469,25 @@ const SimpleDashboard = () => {
                   Click on any reel to configure its automation
                 </p>
               </div>
-              <Button
-                onClick={refreshReels}
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2 border-gray-300 hover:border-purple-400 hover:text-purple-600 transition-colors"
-              >
-                <RefreshCw className="w-4 h-4" />
-                Refresh
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => setShowBulkApplyModal(true)}
+                  size="sm"
+                  className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg transition-all"
+                >
+                  <Zap className="w-4 h-4" />
+                  Apply to All
+                </Button>
+                <Button
+                  onClick={refreshReels}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2 border-gray-300 hover:border-purple-400 hover:text-purple-600 transition-colors"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Refresh
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent className="p-6">
@@ -776,6 +860,135 @@ const SimpleDashboard = () => {
                   onClick={() => handleSaveAutomation(selectedAutomation)}
                 >
                   Save Changes
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+      
+      {/* Bulk Apply Modal */}
+      {showBulkApplyModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <CardHeader className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="w-5 h-5" />
+                Apply Automation to All Reels
+              </CardTitle>
+              <p className="text-sm text-purple-100 mt-2">
+                Configure automation once and apply to all {reels.length} reels
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6 p-6">
+              {/* Comment Replies */}
+              <div>
+                <Label className="text-base font-semibold mb-3 block">Comment Replies (2+ replies recommended)</Label>
+                <div className="p-3 bg-purple-50 rounded-lg border border-purple-200 mb-3">
+                  <p className="text-sm text-purple-900">✨ One reply will be randomly selected for each comment</p>
+                </div>
+                <div className="flex gap-2 mb-3">
+                  <textarea
+                    placeholder="Enter a comment reply..."
+                    value={bulkApplyNewReply}
+                    onChange={(e) => setBulkApplyNewReply(e.target.value)}
+                    rows={2}
+                    className="flex-1 p-3 border rounded-lg text-sm"
+                  />
+                  <Button size="sm" onClick={addBulkReply} className="px-3 h-fit">Add</Button>
+                </div>
+                <div className="space-y-2">
+                  {bulkApplyCommentReplies.map((reply, index) => (
+                    <div key={index} className="p-3 bg-gray-50 rounded-lg border border-gray-200 flex items-start justify-between gap-2">
+                      <p className="text-sm text-gray-800 flex-1">{reply}</p>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => removeBulkReply(index)}
+                        className="hover:bg-red-100 hover:text-red-600 flex-shrink-0"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Opening DM */}
+              <div>
+                <Label className="text-base font-semibold mb-2 block">Opening DM Message</Label>
+                <textarea
+                  value={followerDmTemplate}
+                  onChange={(e) => setFollowerDmTemplate(e.target.value)}
+                  rows={3}
+                  className="w-full p-3 border rounded-lg text-sm"
+                  placeholder="First message they receive after commenting..."
+                />
+              </div>
+
+              {/* Trigger Type */}
+              <div>
+                <Label className="text-base font-semibold mb-2 block">Trigger Type</Label>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 p-2 border rounded-lg">
+                    <input type="radio" id="any" defaultChecked className="w-4 h-4" />
+                    <label htmlFor="any" className="text-sm cursor-pointer flex-1">Any Comment (reply to all)</label>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 border rounded-lg">
+                    <input type="radio" id="keywords" className="w-4 h-4" />
+                    <label htmlFor="keywords" className="text-sm cursor-pointer flex-1">Specific Keywords</label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Offer */}
+              <div>
+                <Label className="text-base font-semibold mb-2 block">Main Offer + Link</Label>
+                <textarea
+                  value={commentTemplate}
+                  onChange={(e) => setCommentTemplate(e.target.value)}
+                  rows={3}
+                  className="w-full p-3 border rounded-lg text-sm mb-3"
+                  placeholder="Your offer message..."
+                />
+                <input
+                  type="text"
+                  value={ctaButtons[0]?.text || "Get Access"}
+                  onChange={(e) => setCtaButtons([{ ...ctaButtons[0], text: e.target.value }])}
+                  className="w-full p-3 border rounded-lg text-sm mb-2"
+                  placeholder="Button text"
+                />
+                <input
+                  type="text"
+                  value={ctaButtons[0]?.url || "https://yourlink.com"}
+                  onChange={(e) => setCtaButtons([{ ...ctaButtons[0], url: e.target.value }])}
+                  className="w-full p-3 border rounded-lg text-sm"
+                  placeholder="Button URL"
+                />
+              </div>
+
+              {/* Summary */}
+              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-sm text-blue-900">
+                  <span className="font-semibold">⚡ Summary:</span> This automation will be applied to all {reels.length} reels with {bulkApplyCommentReplies.length} random comment replies.
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setShowBulkApplyModal(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white"
+                  onClick={handleApplyToAllReels}
+                >
+                  <Zap className="w-4 h-4 mr-2" />
+                  Apply to All {reels.length} Reels
                 </Button>
               </div>
             </CardContent>
