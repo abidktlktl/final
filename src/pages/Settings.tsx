@@ -23,20 +23,13 @@ import {
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { SimpleBottomNav } from "@/components/SimpleBottomNav";
-import { MessageTemplateModal } from "@/components/MessageTemplateModal";
 import { ProfileSettings } from "@/components/ProfileSettings";
-import { BillingPricing } from "@/components/BillingPricing";
-import { DmAutomationSettings } from "@/components/DmAutomationSettings";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Settings = () => {
   const navigate = useNavigate();
   const [importing, setImporting] = useState(false);
-  const [showCommentTemplates, setShowCommentTemplates] = useState(false);
-  const [showDMTemplates, setShowDMTemplates] = useState(false);
   const [showProfileSettings, setShowProfileSettings] = useState(false);
-  const [showBillingPricing, setShowBillingPricing] = useState(false);
-  const [showDmAutomation, setShowDmAutomation] = useState(false);
 
   const handleExport = async () => {
     try {
@@ -175,85 +168,8 @@ const Settings = () => {
             </CardContent>
           </Card>
 
-          <Card 
-            className="border border-gray-200 shadow-md hover:shadow-xl hover:border-green-300 transition-all cursor-pointer bg-white group"
-            onClick={() => setShowBillingPricing(true)}
-          >
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-                  <CreditCard className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg text-gray-900">Billing & Pricing</h3>
-                  <p className="text-sm text-gray-500">Subscription management</p>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-green-600 transition-colors" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card 
-            className="border border-gray-200 shadow-md hover:shadow-xl hover:border-pink-300 transition-all cursor-pointer bg-white group"
-            onClick={() => setShowDmAutomation(true)}
-          >
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-                  <FileText className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg text-gray-900">DM Automation</h3>
-                  <p className="text-sm text-gray-500">Auto-reply settings</p>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-pink-600 transition-colors" />
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
-        {/* Message Templates */}
-        <Card className="border-0 shadow-xl bg-white overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 px-6 py-5">
-            <CardTitle className="flex items-center gap-2 text-xl font-bold text-gray-900">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                <FileText className="w-4 h-4 text-white" />
-              </div>
-              Message Templates
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 space-y-4">
-            <p className="text-sm text-gray-600">
-              Create and manage reusable message templates for comments and DMs.
-            </p>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <Button
-                variant="outline"
-                onClick={() => setShowCommentTemplates(true)}
-                className="flex items-center justify-center gap-2 h-12 border-purple-200 hover:border-purple-400 hover:bg-purple-50 transition-all"
-              >
-                <BookOpen className="w-4 h-4 text-purple-600" />
-                <span className="font-medium">Comment Templates</span>
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setShowDMTemplates(true)}
-                className="flex items-center justify-center gap-2 h-12 border-pink-200 hover:border-pink-400 hover:bg-pink-50 transition-all"
-              >
-                <BookOpen className="w-4 h-4 text-pink-600" />
-                <span className="font-medium">DM Templates</span>
-              </Button>
-            </div>
-            
-            <div className="flex items-center gap-2 p-3 bg-purple-50 rounded-lg border border-purple-200">
-              <Sparkles className="w-4 h-4 text-purple-600" />
-              <p className="text-xs text-purple-700">
-                Templates help maintain consistent messaging across all automations
-              </p>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Privacy & Security */}
         <Card className="border-0 shadow-xl bg-white overflow-hidden">
@@ -384,53 +300,12 @@ const Settings = () => {
         </Card>
       </main>
 
-      {/* Template Modals */}
-      <MessageTemplateModal
-        isOpen={showCommentTemplates}
-        onClose={() => setShowCommentTemplates(false)}
-        onSelectTemplate={() => {}}
-        type="comment"
-      />
-      
-      <MessageTemplateModal
-        isOpen={showDMTemplates}
-        onClose={() => setShowDMTemplates(false)}
-        onSelectTemplate={() => {}}
-        type="dm"
-      />
-
       {/* Profile Settings Modal */}
       {showProfileSettings && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
           <div className="bg-background rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <ProfileSettings onClose={() => setShowProfileSettings(false)} />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Billing & Pricing Modal */}
-      {showBillingPricing && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-background rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <BillingPricing onClose={() => setShowBillingPricing(false)} />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* DM Automation Modal */}
-      {showDmAutomation && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-background rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold">DM Automation Settings</h2>
-                <Button variant="ghost" onClick={() => setShowDmAutomation(false)}>✕</Button>
-              </div>
-              <DmAutomationSettings />
             </div>
           </div>
         </div>
