@@ -534,7 +534,7 @@ const SimpleDashboard = () => {
                 </div>
 
                 {/* Reels Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                   {reels.map((reel) => {
                     const hasAutomation = !!automations[reel.id];
                     return (
@@ -557,7 +557,7 @@ const SimpleDashboard = () => {
                           }
                         }}
                       >
-                        <div className="aspect-[9/16] bg-gray-100 rounded-xl overflow-hidden shadow-lg">
+                        <div className="aspect-[9/16] bg-gray-100 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow">
                           {reel.thumbnail && reel.thumbnail !== '/placeholder.svg' ? (
                             <img
                               src={reel.thumbnail}
@@ -566,7 +566,7 @@ const SimpleDashboard = () => {
                             />
                           ) : (
                             <div className="w-full h-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
-                              <Play className="w-10 h-10 text-purple-600" />
+                              <Play className="w-8 h-8 text-purple-600" />
                             </div>
                           )}
                           
@@ -624,12 +624,12 @@ const SimpleDashboard = () => {
                         </div>
                         
                         {/* Caption & Info */}
-                        <div className="mt-2">
-                          <p className="text-xs font-medium line-clamp-1 text-gray-800">
+                        <div className="mt-2 px-1">
+                          <p className="text-xs font-semibold line-clamp-2 text-gray-900">
                             {reel.caption || 'No caption'}
                           </p>
                           {reel.timestamp && (
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-gray-400 mt-1">
                               {new Date(reel.timestamp).toLocaleDateString()}
                             </p>
                           )}
