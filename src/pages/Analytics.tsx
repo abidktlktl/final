@@ -9,7 +9,6 @@ import { toast } from "@/hooks/use-toast";
 import { SimpleBottomNav } from "@/components/SimpleBottomNav";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ProfileSettings } from "@/components/ProfileSettings";
-import { BillingPricing } from "@/components/BillingPricing";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import {
   LineChart,
@@ -61,8 +60,6 @@ const Analytics = () => {
   const [user, setUser] = useState<{name: string; email?: string} | null>(null);
   const [loading, setLoading] = useState(true);
   const [showProfileSettings, setShowProfileSettings] = useState(false);
-  const [showBillingPricing, setShowBillingPricing] = useState(false);
-  const [currentPlan, setCurrentPlan] = useState('pro');
 
   useEffect(() => {
     const token = localStorage.getItem('instaauto-token');
@@ -155,15 +152,6 @@ const Analytics = () => {
             </div>
             <div className="flex items-center gap-3">
               <ThemeToggle />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowBillingPricing(true)}
-                className="hidden sm:flex items-center gap-2"
-              >
-                <CreditCard className="w-4 h-4" />
-                Billing
-              </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -185,10 +173,6 @@ const Analytics = () => {
               <DropdownMenuItem onClick={() => setShowProfileSettings(true)}>
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile Settings</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setShowBillingPricing(true)}>
-                <CreditCard className="mr-2 h-4 w-4" />
-                <span>Billing & Pricing</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
@@ -420,17 +404,6 @@ const Analytics = () => {
           <div className="bg-background rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <ProfileSettings onClose={() => setShowProfileSettings(false)} />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Billing & Pricing Modal */}
-      {showBillingPricing && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-background rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <BillingPricing onClose={() => setShowBillingPricing(false)} />
             </div>
           </div>
         </div>
